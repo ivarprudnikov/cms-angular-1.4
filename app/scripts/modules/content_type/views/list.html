@@ -10,7 +10,6 @@
 </div>
 
 <div class="container">
-
   <table class="table table-bordered table-striped">
     <thead>
     <tr>
@@ -20,31 +19,15 @@
     </tr>
     </thead>
     <tbody>
-
-      <tr ng-repeat="item in items">
+      <tr ng-repeat="item in items track by $index">
         <td>
-          <a ui-sref="^.show({id:item.id})">{{ item.key }}</a>
+          <a ui-sref="^.show({id:item.key})">{{ item.key }}</a>
         </td>
         <td>{{ item.name }}</td>
         <td>
           <span class="label label-default" ng-repeat="(propName, propDescription) in item.schema.properties">{{propName}}</span>
         </td>
       </tr>
-
-      <tr class="danger" ng-repeat="key in unhandledKeys">
-        <td>N/A</td>
-        <td>{{ key }}</td>
-        <td>N/A</td>
-        <td>N/A</td>
-      </tr>
-
     </tbody>
   </table>
-
-  <div ng-if="unhandledKeys.length">
-    <hr class="hr-fat">
-    <p class="alert alert-danger">Following keys do not have content types set up, although data is present</p>
-    <span ng-repeat="k in unhandledKeys" class="badge">{{k}}</span>
-  </div>
-
 </div>

@@ -24,32 +24,33 @@ angular
 			})
 			.state('content_type.list', {
 				url: '',
-        data: {
-          pageTitle: 'Content types'
-        },
 				templateUrl: 'scripts/modules/content_type/views/list.html',
 				controller: ['$scope', 'ContentTypeService', function($scope, ContentTypeService){
-
-					// TODO: load items
-
+          ContentTypeService.list()
+            .then(function(items){
+              $scope.items = items;
+            });
 				}]
 			})
 			.state('content_type.show', {
 				url: '/show/:id',
-        data: {
-          pageTitle: 'Show content type'
-        },
 				templateUrl: 'scripts/modules/content_type/views/show.html',
-				controller: ['$scope', '$state', '$stateParams', function($scope, $state, $stateParams){
+				controller: ['$scope', 'ContentTypeService', '$stateParams', function($scope, ContentTypeService, $stateParams){
 					var id = $stateParams.id;
-          // TODO load item by id
+          if(id != null){
+            ContentTypeService.findByKey(id)
+              .then(function(item){
+                item = item || {};
+                item.schema = item.schema || {};
+                item.schema.properties = item.schema.properties || {};
+                $scope.fieldKeys = Object.keys(item.schema.properties);
+                $scope.item = item;
+              });
+          }
 				}]
 			})
 			.state('content_type.create', {
 				url: '/create',
-        data: {
-          pageTitle: 'Create content type'
-        },
 				templateUrl: 'scripts/modules/content_type/views/create.html',
 				controller: ['$scope', '$state', 'SchemaService', 'ModalFactoryForMessage', 'ContentTypeService',
           function($scope, $state, SchemaService, ModalFactoryForMessage, ContentTypeService){
@@ -63,10 +64,13 @@ angular
 							required: []
 						}
 					};
+
           $scope.newItem = angular.copy(itemTemplate);
 
 					$scope.save = function () {
+
 						var newItem = angular.copy($scope.newItem);
+
 						if (!newItem.key.length || !newItem.name.length) {
 							ModalFactoryForMessage.open({title:'Error',message:'Name and Key are required'});
 							return;
@@ -77,13 +81,12 @@ angular
 								var errMessage = 'Key must be unique, ' + existingContentType.name + ' content type already defined it.';
 								ModalFactoryForMessage.open({title:'Error',message:errMessage});
 							} else {
-                // TODO store item
-								//$scope.items.$add(newItem).then(function(ref) {
-								//	$scope.newItem = angular.copy(itemTemplate);
-								//	$state.go('^.list');
-								//}).catch(function(){
-								//	ModalFactoryForMessage.open({title:'Error',message:'Could not save content type.'});
-								//});
+                ContentTypeService.save(newItem)
+                  .then(function(){
+                    $state.go('^.list');
+                  }).catch(function(){
+                  	ModalFactoryForMessage.open({title:'Error',message:'Could not save content type.'});
+                  });
 							}
 						});
 					};
@@ -104,16 +107,18 @@ angular
 			})
 			.state('content_type.edit', {
 				url: '/edit/:id',
-        data: {
-          pageTitle: 'Edit content type'
-        },
 				templateUrl: 'scripts/modules/content_type/views/edit.html',
-				controller: ['$scope', '$state', '$stateParams', 'SchemaService', 'ModalFactoryForDelete', 'ContentModelService', 'ModalFactoryForMessage',
-          function($scope, $state, $stateParams, SchemaService, ModalFactoryForDelete, ContentModelService, ModalFactoryForMessage){
+				controller: ['$scope', '$state', '$stateParams', 'SchemaService', 'ModalFactoryForDelete', 'ContentModelService', 'ContentTypeService', 'ModalFactoryForMessage',
+          function($scope, $state, $stateParams, SchemaService, ModalFactoryForDelete, ContentModelService, ContentTypeService, ModalFactoryForMessage){
 
 					var id = $stateParams.id;
 
-          // TODO: load item
+          if(id != null){
+            ContentTypeService.findByKey(id)
+              .then(function(item){
+                $scope.item = item;
+              });
+          }
 
           $scope.addSchemaField = function(){
             SchemaService.addField($scope.item.schema);
@@ -129,45 +134,34 @@ angular
 
           $scope.save = function(form){
             if(form.$valid){
-              $scope.item.$save().then(function(ref) {
-                $state.go('^.show',{id:$scope.item.$id});
-              }, function(error) {
-                console.log("save error:", error);
-              });
+              ContentTypeService.update($scope.item)
+                .then(function(item){
+                  $state.go('^.show',{id:item.key});
+                });
             }
           };
 
 					$scope.delete = function(){
-
             if($scope.deleteInProgress){
               return;
             }
-
             $scope.deleteInProgress = true;
-
-						ContentModelService.keyHasChildren($scope.item.key).then(function(result){
-							if(result){
-								ModalFactoryForMessage.open({title:'Entries exist!', message:'You should delete all instances of this type first.'});
-                $scope.deleteInProgress = false;
-							} else {
-								ModalFactoryForDelete.open().then(function(){
-		              $scope.item.$remove().then(function(ref) {
-		                $state.go('^.list');
-		              }, function(error) {
-                    console.log("Error:", error);
-                    ModalFactoryForMessage.open({title:'Error', message:'Server error. Could not remove item.'});
-                    $scope.deleteInProgress = false;
-		              });
-		            }, function(){
+						ContentModelService.keyHasChildren($scope.item.key)
+              .then(function(result){
+                if(result){
                   $scope.deleteInProgress = false;
-                });
-							}
-						}, function(rejection){
-              console.log("Error:", rejection);
-              ModalFactoryForMessage.open({title:'Error', message:'Server error. Could not remove item.'});
-              $scope.deleteInProgress = false;
-            });
-
+                  return ModalFactoryForMessage.open({title:'Entries exist!', message:'You should delete all instances of this type first.'});
+                } else {
+                  return ModalFactoryForDelete.open()
+                    .then(ContentTypeService.delete($scope.item.key))
+                    .then(function() {
+                      $state.go('^.list');
+                    })
+                    .finally(function(){
+                      $scope.deleteInProgress = false;
+                    });
+                }
+              });
 					};
 
 				}]

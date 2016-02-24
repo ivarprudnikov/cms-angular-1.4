@@ -7,7 +7,12 @@ angular
     'ui.bootstrap',
     'ui.router'
 	])
-  .controller('HeaderMainController', ['$scope', function($scope){
+  .controller('HeaderMainController', ['$scope', 'ContentTypeService', function($scope, ContentTypeService){
+
+    ContentTypeService.list()
+      .then(function(items){
+        $scope.contentTypes = items;
+      });
 
     $scope.logout = function(){
       // TODO

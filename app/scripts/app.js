@@ -13,7 +13,9 @@ angular
     'admin.webclient.header',
     'admin.webclient.modals',
     'admin.webclient.schema',
-    'admin.webclient.content_type'
+    'admin.webclient.content_type',
+    'admin.webclient.content_model',
+    'admin.webclient.util'
 	])
 
 	.run(['$rootScope', '$state', '$timeout', function ($rootScope, $state, $timeout) {

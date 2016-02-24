@@ -1,19 +1,17 @@
-<div ng-if="sec.canEditContentTypes()" class="page-head">
+<div class="page-head">
   <div class="container">
     <div class="title">
       <h1>Content type - {{item.name}}</h1>
     </div>
     <div class="actions">
       <a ui-sref="^.list" class="btn btn-default btn-sm">List all</a>
-      <a ui-sref="^.show({id:item.$id})" class="btn btn-default btn-sm">Preview this content type</a>
+      <a ui-sref="^.show({id:item.key})" class="btn btn-default btn-sm">Preview this content type</a>
       <a ui-sref="^.create" class="btn btn-default btn-sm">Create new</a>
     </div>
   </div>
 </div>
 
-<div ng-if="!sec.canEditContentTypes()" class="alert alert-danger">You cannot access this feature</div>
-
-<div ng-if="sec.canEditContentTypes()" class="container">
+<div class="container">
 
   <div class="row">
 
@@ -48,20 +46,20 @@
           <label>Content type fields</label>
 
           <ul class="list-group">
-            <li class="list-group-item" ng-repeat="v in item.schema.properties | orderObjectBy:'field_position'">
-              <a href="javascript:void(0)" class="pull-right btn btn-link btn-sm" ng-click="editSchemaField(v.__key)">
+            <li class="list-group-item" ng-repeat="(k,v) in item.schema.properties">
+              <a href="javascript:void(0)" class="pull-right btn btn-link btn-sm" ng-click="editSchemaField(k)">
                 <span class="glyphicon glyphicon-edit"></span>
                 Edit
               </a>
-              <a href="javascript:void(0)" class="pull-right btn btn-link btn-sm" ng-click="deleteSchemaField(v.__key)">
+              <a href="javascript:void(0)" class="pull-right btn btn-link btn-sm" ng-click="deleteSchemaField(k)">
                 <span class="glyphicon glyphicon-remove"></span>
                 Remove
               </a>
               <p>
-                <span class="">{{v.title || v.__key}}</span>
-                <span class="label label-default">Key: {{v.__key}}</span>
+                <span class="">{{v.title || k}}</span>
+                <span class="label label-default">Key: {{k}}</span>
                 <span class="label label-info">{{v['x-schema-form'].type || v.type}}</span>
-                <span class="label label-warning" ng-repeat="req in item.schema.required | filter:v.__key">Is required</span>
+                <span class="label label-warning" ng-repeat="req in item.schema.required | filter:k">Is required</span>
               </p>
               <p>{{v.description}}</p>
             </li>
@@ -89,116 +87,10 @@
 
         </fieldset>
 
-        <fieldset>
-
-          <legend>Aggregation settings</legend>
-
-          <div class="form-group">
-            <label for="isLinked">
-              <input id="isLinked" type="checkbox" ng-model="item.aggregation.isLinked"> Is it linked to external resource?
-            </label>
-          </div>
-
-          <div ng-show="item.aggregation.isLinked"
-               ng-class="{ 'has-error': (editForm.$submitted || editForm.aggregationType.$touched) && editForm.aggregationType.$invalid }"
-               class="form-group" >
-            <label for="aggregationType" class="control-label">Type</label>
-            <select id="aggregationType" name="aggregationType"
-                    ng-model="item.aggregation.type"
-                    class="form-control"
-                    ng-required="item.aggregation.isLinked"
-                  ng-options="k as type.name for (k,type) in aggregationTypes">
-              <option value="">-- Choose an option --</option>
-            </select>
-            <p class="help-block ">What type of external resource is it linked to?</p>
-          </div>
-
-          <div ng-show="item.aggregation.isLinked"
-               ng-class="{ 'has-error': (editForm.$submitted || editForm.idField.$touched) && editForm.idField.$invalid }"
-               class="form-group">
-
-            <label for="idField" class="control-label">ID field</label>
-            <input type="text"
-                   id="idField"
-                   name="idField"
-                   class="form-control"
-                   placeholder="ID field"
-                   ng-model="item.aggregation.idField"
-                   ng-required="item.aggregation.isLinked">
-            <p class="help-block ">Which local field represents aggregated resource ID in remote system? Needs to be field key and not the name. eg: local item could have field with key <code>facebookItemId</code> which represents item id in Facebook</p>
-          </div>
-
-          <div ng-show="item.aggregation.isLinked"
-               ng-class="{ 'has-error': (editForm.$submitted || editForm.titleFieldRemote.$touched) && editForm.titleFieldRemote.$invalid }"
-              class="form-group">
-            <label for="name">Aggregated title field path</label>
-            <input type="text"
-                   id="titleFieldRemote"
-                   name="titleFieldRemote"
-                    ng-model="item.aggregation.titleFieldPath"
-                    class="form-control"
-                    ng-required="item.aggregation.isLinked"
-                   placeholder="eg: group.title">
-            <p class="help-block ">Path (keys separated with dots) to field within aggregated data, which is going to be used as a fallback, in case nothing is selected for primary title or no primary title exists (default option is used)</p>
-          </div>
-
-          <div ng-show="item.aggregation.isLinked" class="form-group">
-
-            <label>Queries</label>
-
-            <ul class="list-group">
-              <li class="list-group-item">
-                <span class="title">Default - always active</span>
-              </li>
-              <li class="list-group-item" ng-repeat="(name,query) in item.aggregation.queries">
-                <div class="btn-group pull-right dropdown" dropdown="">
-                  <button type="button" class="btn btn-link btn-sm dropdown-toggle" dropdown-toggle="">
-                    <span>Options</span>
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li>
-                      <a href="javascript:void(0)" ng-click="editAggregationQuery(name)">
-                        <span class="glyphicon glyphicon-edit"></span>
-                        Edit
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0)" ng-click="cloneAggregationQuery(name)">
-                        <span class="glyphicon glyphicon-duplicate"></span>
-                        Clone
-                      </a>
-                    </li>
-                    <li>
-                      <a href="javascript:void(0)" ng-click="removeAggregationQuery(name)">
-                        <span class="glyphicon glyphicon-remove"></span>
-                        Remove
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-                <p>
-                  <span class="title">{{name}}</span>
-                  <span class="meta" ng-repeat="(k,v) in query">{{k}}: {{v}}</span>
-                </p>
-              </li>
-            </ul>
-
-            <div class="form-group text-right">
-              <button type="button" class="btn btn-default btn-sm" ng-click="addAggregationQuery()">
-                <span class="glyphicon glyphicon-plus"></span>
-                Add new query
-              </button>
-            </div>
-
-          </div>
-
-        </fieldset>
-
         <p ng-show="editForm.$submitted && editForm.$invalid" class="alert alert-danger">Form is not valid, you need to fix issues before saving</p>
 
         <div class="form-group text-right">
-          <a ui-sref="^.show({id:item.$id})" class="btn btn-link btn-lg">Cancel</a>
+          <a ui-sref="^.show({id:item.key})" class="btn btn-link btn-lg">Cancel</a>
           <button type="submit" class="btn btn-primary btn-lg" ng-disabled="editForm.$submitted && editForm.$invalid">
             <span class="glyphicon glyphicon-floppy-disk"></span>
             Save changes
@@ -207,7 +99,7 @@
 
     	</form>
 
-      <hr class="hr-fat">
+      <hr>
 
       <div class="panel panel-danger">
         <div class="panel-heading">
@@ -226,7 +118,7 @@
     </div>
 
     <div class="col-sm-4">
-      <div json-preview obj="item" display-name="'Preview'"></div>
+      <pre>{{item | json}}</pre>
     </div>
 
   </div>

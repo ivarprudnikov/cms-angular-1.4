@@ -5,8 +5,8 @@
     </div>
     <div class="actions">
       <a ui-sref="^.list" class="btn btn-default btn-sm">List all</a>
-      <a ng-if="sec.canEditContentTypes()" ui-sref="^.create" class="btn btn-default btn-sm">Create new</a>
-      <a ng-if="sec.canEditContentTypes()" ui-sref="^.edit({id:item.$id})" class="btn btn-default btn-sm">Edit this content type</a>
+      <a ui-sref="^.create" class="btn btn-default btn-sm">Create new</a>
+      <a ui-sref="^.edit({id:item.key})" class="btn btn-default btn-sm">Edit this content type</a>
     </div>
   </div>
 </div>
@@ -31,7 +31,7 @@
 
       <p class="alert alert-danger" ng-hide="fieldKeys.length">
         Please specify which fields are used by this content type
-        <a ng-if="sec.canEditContentTypes()" ui-sref="^.edit({id:item.$id})" class="btn btn-default btn-sm">Edit this content type</a>
+        <a ui-sref="^.edit({id:item.key})" class="btn btn-default btn-sm">Edit this content type</a>
       </p>
 
       <table class="table table-bordered table-condensed" ng-show="fieldKeys.length">
@@ -47,16 +47,6 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-class="{'active': !item.titleField}">
-            <td>$id</td>
-            <td>$id</td>
-            <td>Default ID field</td>
-            <td>string</td>
-            <td>true</td>
-            <td>text</td>
-            <td>{{ !item.titleField ? 'Yes' : '' }}</td>
-          </tr>
-
           <tr ng-repeat="field in fieldKeys" ng-class="{'active': item.titleField === field}">
             <td>{{field}}</td>
             <td>{{item.schema.properties[field].title}}</td>
@@ -69,36 +59,10 @@
         </tbody>
       </table>
 
-      <h3>Content aggregation</h3>
-
-      <dl>
-        <dt>Is it linked to external resource?</dt>
-        <dd><span class="label label-info">{{ item.aggregation.isLinked | booleanFilter }}</span></dd>
-
-        <div ng-show="item.aggregation.isLinked">
-          <dt>What type of external resource is it linked to?</dt>
-          <dd><span class="label label-info">{{ item.aggregation.type }}</span></dd>
-          <dt>Which local field represents external resource ID in remote system?</dt>
-          <dd><span class="label label-info">{{ item.aggregation.idField }}</span></dd>
-          <dt>Path to default title field</dt>
-          <dd><span class="label label-info">{{ !!item.aggregation.titleFieldPath ? 'SOURCE.'+item.aggregation.titleFieldPath : 'IS NOT SET' }}</span></dd>
-          <dt>Queries used to aggregate remote data:</dt>
-          <dd>
-            <ul class="list-unstyled">
-              <li><span class="label label-info">default</span> - manually added entries will be merged with external ones</li>
-              <li ng-repeat="(name,query) in item.aggregation.queries">
-                <span class="label label-info">{{name}}</span> -
-                <span class="label label-default" ng-repeat="(k,v) in query">{{k}}: {{v}}</span>
-              </li>
-            </ul>
-          </dd>
-        </div>
-      </dl>
-
     </div>
 
     <div class="col-sm-4">
-      <div json-preview obj="item" display-name="'Preview'"></div>
+      <pre>{{ item | json }}</pre>
     </div>
 
   </div>

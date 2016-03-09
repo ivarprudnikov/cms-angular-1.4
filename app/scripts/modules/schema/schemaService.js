@@ -22,8 +22,7 @@ angular
 
       schema.properties[field.key] = {
         type: field.type,
-        title: field.title,
-        field_position: field.field_position // for ordering
+        title: field.title
       };
 
       if(field.description){

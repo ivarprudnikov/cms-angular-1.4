@@ -8,7 +8,7 @@ angular
 
     function getStorage(){
       return JSON.parse($window.localStorage.getItem(STORAGE_KEY)) || {};
-    };
+    }
 
     function setStorage(key, data){
       var existing = getStorage();

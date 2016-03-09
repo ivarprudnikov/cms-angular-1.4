@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/ivarprudnikov/cms-angular-1.4.svg?branch=master)](https://travis-ci.org/ivarprudnikov/cms-angular-1.4)
 
-## [Live demo](http://ivarprudnikov.github.io/cms-angular-1.4)
+## [Live demo](http://ivarprudnikov.github.io/cms-angular-1.4) | [Angular 2.0 version](https://github.com/ivarprudnikov/cms-angular-2.0)
 
 The goal here is to set up angular app that deals with content management, to see later how it compares
 to an app built with later angular version.

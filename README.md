@@ -1,5 +1,9 @@
 # CMS with angular 1.4
 
+[![Build Status](https://travis-ci.org/ivarprudnikov/cms-angular-1.4.svg?branch=master)](https://travis-ci.org/ivarprudnikov/cms-angular-1.4)
+
+## [Live demo](http://ivarprudnikov.github.io/cms-angular-1.4)
+
 The goal here is to set up angular app that deals with content management, to see later how it compares
 to an app built with later angular version.
 
@@ -14,8 +18,5 @@ to an app built with later angular version.
 
 Storage is going to be implemented using localStorage
 
-**Authentication**
-
-User is going to be set in memory
 
 

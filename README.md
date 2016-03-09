@@ -5,10 +5,9 @@ to an app built with later angular version.
 
 **Requirements**
 
-- Authentication is enabled based on path and user role
 - Content is managed via service layer
-- All CRUD operations available
-- Search and pagination is a must
+- All CRUD operations
+- Search and pagination
 - User can create arbitrary types of content and publish it
 
 **Storage**

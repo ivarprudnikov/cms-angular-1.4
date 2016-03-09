@@ -15,7 +15,8 @@ angular
     'admin.webclient.schema',
     'admin.webclient.content_type',
     'admin.webclient.content_model',
-    'admin.webclient.util'
+    'admin.webclient.util',
+    'admin.webclient.html-templates'
 	])
 
 	.run(['$rootScope', '$state', '$timeout', function ($rootScope, $state, $timeout) {

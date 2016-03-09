@@ -20,7 +20,7 @@ script:
 after_success:
 - export GIT_DEPLOY_DIR=dist
 - export GIT_DEPLOY_BRANCH=gh-pages
-- export GIT_DEPLOY_REPO=https://$GITHUB_TOKEN@github.com/ivarprudnikov/cms-angular-2.0.git
+- export GIT_DEPLOY_REPO=https://$GITHUB_TOKEN@github.com/ivarprudnikov/cms-angular-1.4.git
 - source ./deploy_to_github.sh
 - echo "Done deploy.sh"
 
